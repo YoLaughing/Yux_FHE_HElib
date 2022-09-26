@@ -67,7 +67,7 @@ void Transcipher16::encodeTo16Ctxt(Vec<ZZX>& encData, const Vec<uint8_t>& data,
 }
 
 
-// Decode native HE plaintext as AES plaintext/ciphertext bytes
+// Decode native HE plaintext as Yux plaintext/ciphertext bytes
 void Transcipher16::decodeTo16Ctxt(Vec<uint8_t>& data, const Vec<ZZX>& encData,
 		const EncryptedArrayDerived<PA_GF2>& ea)
 {
@@ -108,7 +108,7 @@ void Transcipher16::buildRoundConstant(Ctxt& encA,
   encA.DummyEncrypt(ZZXConstant);
 }
 
-// run the AES key-expansion and then encrypt the expanded key.
+// run the Yux key-expansion and then encrypt the expanded key.
 void Transcipher16::encryptSymKey(vector<Ctxt>& eKey, Vec<uint8_t>& symKey, const PubKey& hePK,
     const EncryptedArrayDerived<PA_GF2>& ea, bool key2dec)
 {

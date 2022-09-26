@@ -17,18 +17,6 @@ void addRoundKey(unsigned char state[], unsigned char RoundKey[], int round)
     }
 }
 
-// This function adds the round key to state.
-// The round key is added to the state by an XOR function.
-void addRoundKey_64bit(unsigned char state[], unsigned char RoundKey[], int round)
-{
-  int i, blockByte = 16;
-  for(i=0;i<(blockByte);i++)
-    {
-      int key_id = blockByte*round+i;
-	    state[i] ^= (RoundKey[key_id] & 0xf);
-    }
-}
-
 unsigned char mul(unsigned char a, unsigned char b) {
     unsigned char p = 0;
     unsigned char counter;
@@ -45,27 +33,6 @@ unsigned char mul(unsigned char a, unsigned char b) {
       return p;
 	}
 
-// 4bit Field multi f(x)= X^4+x+1
-unsigned char mul_4bit(unsigned char a, unsigned char b) {
-    unsigned char p = 0;
-    unsigned char counter;
-    unsigned char hi_bit_set;
-    a = a&0xF;
-    b = b&0xF;
-    for(counter = 0; counter < 4; counter++) {
-          if((b & 1) == 1) 
-                p ^= a;
-          hi_bit_set = (a & 0x08);
-          a <<= 1;
-          a = a&0xF;
-          if(hi_bit_set == 0x08) 
-                a ^= 0x3;       // x+1   
-          b >>= 1;
-      }
-      return p&0xF;
-	}
-
-
 void decSboxFi(unsigned char state[], int begin)
 {
   unsigned char c0=state[begin];
@@ -80,22 +47,6 @@ void decSboxFi(unsigned char state[], int begin)
   state[begin+2] = c3;
   state[begin+3] = temp;
 }
-
-void decSboxFi_16bit(unsigned char state[], int begin)
-{
-  unsigned char c0=state[begin];
-  unsigned char c1=state[begin+1];
-  unsigned char c2=state[begin+2];
-  unsigned char c3=state[begin+3];
-
-  unsigned char temp = mul_4bit(c1,c2) ^ c0 ^ c3 ^ roundConstant;
-
-  state[begin] = c1;
-  state[begin+1] = c2;
-  state[begin+2] = c3;
-  state[begin+3] = temp&0xF;
-}
-
 
 
 void decLinearLayer(unsigned char in[16])
@@ -161,50 +112,6 @@ void decryption(unsigned char out[], unsigned char in[], unsigned char RoundKey[
 
 }
 
-// Cipher is the main function that encrypts the PlainText.
-void decryption_64bit(unsigned char out[], unsigned char in[], unsigned char RoundKey[], int Nr)
-{
-  int i,round;
-  // initial key addition
-  // Add Round key before first round
-
-  for(i=0; i<16; i++){
-      out[i] = in[i];
-  }
-
-  addRoundKey_64bit(out, RoundKey, 0);
-
-  // There will be Nr rounds.
-  // The first Nr-1 rounds are identical.
-  // These Nr-1 rounds are executed in the loop below.
-  for(round=1;round<Nr;round++){
-    // S Layer -- 4 sbox
-    for(i=0; i<4; i++){
-      decSboxFi_16bit(out, i*4);
-      decSboxFi_16bit(out, i*4);
-      decSboxFi_16bit(out, i*4);
-      decSboxFi_16bit(out, i*4);
-    }
-
-    // linear Layer
-    decLinearLayer(out);
-    addRoundKey_64bit(out, RoundKey, round);
-  }
-
-  // The last round is given below.
-  // Linear layer is not here in the last round
-  {
-    for(i=0; i<4; i++){
-      decSboxFi_16bit(out, i*4);
-      decSboxFi_16bit(out, i*4);
-      decSboxFi_16bit(out, i*4);
-      decSboxFi_16bit(out, i*4);
-    }
-    addRoundKey_64bit(out, RoundKey, Nr);
-  }
-
-}
-
 void encSboxFi(unsigned char state[], int begin)
 {
   unsigned char c0=state[begin];
@@ -215,21 +122,6 @@ void encSboxFi(unsigned char state[], int begin)
   unsigned char temp = mul(c0,c1) ^ c2 ^ c3 ^ roundConstant;
 
   state[begin] = temp;
-  state[begin+1] = c0;
-  state[begin+2] = c1;
-  state[begin+3] = c2;
-}
-
-void encSboxFi_64bit(unsigned char state[], int begin)
-{
-  unsigned char c0=state[begin];
-  unsigned char c1=state[begin+1];
-  unsigned char c2=state[begin+2];
-  unsigned char c3=state[begin+3];
-
-  unsigned char temp = mul_4bit(c0,c1) ^ c2 ^ c3 ^ roundConstant ;
-
-  state[begin] = temp&0xF;
   state[begin+1] = c0;
   state[begin+2] = c1;
   state[begin+3] = c2;
@@ -298,44 +190,45 @@ void encryption(unsigned char out[], unsigned char in[], unsigned char RoundKey[
   }
 }
 
-// Cipher is the main function that encrypts the PlainText.
-void encryption_64bit(unsigned char out[], unsigned char in[], unsigned char RoundKey[], int Nr)
+// This function produces Nb(Nr+1) round keys.
+// The round keys are used in each round to encrypt the states.
+void constantForKey(unsigned char RC[56][4], long round)
 {
-  int i,round;
-  // initial key addition
-  // Add Round key before first round
+    // Nr is the round number
+    // Nk is the number of 64-bit Feistel works in the key 4bytes each round.
+    int Nr = round;
+    
+    // The first round key is the key itself. [0-4]
+    int i,j,k;
+    for(i=0;i<56;i++)
+    {
+      unsigned char tmp[4];
+      for(j=0; j<4; j++)
+      {
+        tmp[j] = 4*i+j+1;
+        // printf("%02x ",tmp[j]);
+      }
+      
+      //Sf(tmp)
+      encSboxFi(tmp, 0);
+      encSboxFi(tmp, 0);
+      encSboxFi(tmp, 0);
+      encSboxFi(tmp, 0);
 
-  for(i=0; i<16; i++){
-      out[i] = in[i];
-  }
-  addRoundKey_64bit(out, RoundKey, 0);
-
-  // There will be Nr rounds.
-  // The first Nr-1 rounds are identical.
-  // These Nr-1 rounds are executed in the loop below.
-  for(round=1;round<Nr;round++){
-    // S Layer -- 4 sbox
-    for(i=0; i<4; i++){
-      encSboxFi_64bit(out, i*4);
-      encSboxFi_64bit(out, i*4);
-      encSboxFi_64bit(out, i*4);
-      encSboxFi_64bit(out, i*4);
+      // mcsry RC[i]=tmp;
+      memcpy(&RC[i], &tmp[0], 4);
     }
-    // linear Layer
-    encLinearLayer(out);
-    addRoundKey_64bit(out, RoundKey, round);
-  }
+}
 
-  // The last round is given below.
-  // Linear layer is not here in the last round
+// array a, length = l, <<<3
+void rotation(unsigned char *a, int l,int r){
+	unsigned char temp[l];
+	for (int i = 0; i < l; i++){
+		temp[i] = a[(i+r)%l];
+	}
+  for (int i =0; i< l; i++)
   {
-    for(i=0; i<4; i++){
-      encSboxFi_64bit(out, i*4);
-      encSboxFi_64bit(out, i*4);
-      encSboxFi_64bit(out, i*4);
-      encSboxFi_64bit(out, i*4);
-    }
-    addRoundKey_64bit(out, RoundKey, Nr);
+    a[i]=temp[i];
   }
 }
 
@@ -355,14 +248,44 @@ long KeyExpansion(unsigned char RoundKey[], long round, long blockByte,  unsigne
         RoundKey[i]=Key[i];
     }
 
+    unsigned char RC[56][4];
+    constantForKey(RC, round);
+
+    int x4id = 16;
     // the rest round key is the key it self.
-    for(i=1; i<=Nr; i++) //[1-9]
+    for(i=0; i<Nr*4; i++) //[1-9]
     { 
-      for(j=0;j<Nk;j++) //[0-16]
+
+      int x0id = i*4;
+      int x1id = x0id+4;
+      int x2id = x1id+4;
+      int x3id = x2id+4;
+      // x4 = x1+x2+x3
+      unsigned char x4[4];
+      for(j=0;j<4;j++) 
       {
-          k = Nk * i;  // k = 8*r
-          RoundKey[k+j]=Key[j]| Key[(j+i)%Nk];
+        x4[j] = RoundKey[x1id+j];
+        x4[j] ^= RoundKey[x2id+j];
+        x4[j] ^= RoundKey[x3id+j]; 
       }
+      // <<<3
+      rotation(x4, 4, 3);
+
+      // x4=Sf(x4)
+      encSboxFi(x4, 0);
+      encSboxFi(x4, 0);
+      encSboxFi(x4, 0);
+      encSboxFi(x4, 0);
+
+      // RK[i*4+16 ~ i*4+20] =x0+x4+RC[i]
+      for(j=0; j<4; j++)
+      {
+        x4[j] ^= RoundKey[x0id+j];
+        x4[j] ^= RC[i][j];
+        // printf("RC[ij]: %02x", RC[i][j]);
+        RoundKey[x4id+j] = x4[j];
+      }
+      x4id +=4;
     }
   return Nr+1;
 }

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(aes LANGUAGES CXX)
+project(Yux LANGUAGES CXX)
 
 ## Use -std=c++17 as default.
 set(CMAKE_CXX_STANDARD 17)

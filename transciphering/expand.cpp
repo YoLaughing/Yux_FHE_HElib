@@ -21,7 +21,7 @@ void Transcipher16::encodeToKeysForExpand(ZZX& encData, const Vec<uint8_t>& data
   ea.encode(encData, slots);
 }
 
-// run the AES key-expansion and then encrypt the expanded key.
+// run the Yux key-expansion and then encrypt the expanded key.
 void Transcipher16::encryptSymKeyForExpand(Ctxt& eKey, Vec<uint8_t>& symKey, const PubKey& hePK,
   const EncryptedArrayDerived<PA_GF2>& ea, bool key2dec)
 {

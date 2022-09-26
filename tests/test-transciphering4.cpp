@@ -59,10 +59,10 @@ int main(int argc, char **argv){
   setTimersOn();
   double tm = -GetTime();
 
-  static const uint8_t aesPolyBytes[] = { 0x1B, 0x1 }; // X^8+X^4+X^3+X+1
-  const GF2X aesPoly = GF2XFromBytes(aesPolyBytes, 2);
+  static const uint8_t YuxPolyBytes[] = { 0x1B, 0x1 }; // X^8+X^4+X^3+X+1
+  const GF2X YuxPoly = GF2XFromBytes(YuxPolyBytes, 2);
   cout << "-----X^8+X^4+X^3+X+1-------\n";  
-  cout << "-----aesPoly: " << aesPoly << "\n";
+  cout << "-----YuxPoly: " << YuxPoly << "\n";
 
   cout << "computing key-independent tables..." << std::flush;
   // Some code here to choose all the parameters, perhaps
@@ -111,9 +111,9 @@ int main(int argc, char **argv){
   // compute key-switching matrices that we need
 
   tm += GetTime();
-  cout << "done in "<<tm<<" seconds\n" << ", deg(aesPoly)="  << deg(aesPoly) <<endl;
+  cout << "done in "<<tm<<" seconds\n" << ", deg(YuxPoly)="  << deg(YuxPoly) <<endl;
   
-  EncryptedArrayDerived<PA_GF2> ea(context, aesPoly, context.getAlMod());
+  EncryptedArrayDerived<PA_GF2> ea(context, YuxPoly, context.getAlMod());
   cout << "constuct an Encrypted array object ea that is.\n";
   long nslots = ea.size(); // number of plaintext slots
   cout << "-----number of plaintext slots: " << nslots << "\n\n";

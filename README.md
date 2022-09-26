@@ -30,7 +30,6 @@ sudo make install
 After install [HElib](https://github.com/homenc/HElib), you can run our tests by
 
 ```
-cd helib_v2_2_1
 mkdir build
 cd build
 cmake ..
@@ -38,3 +37,5 @@ make
 ./TEST_SPN
 ./TEST_SPN_16Ctxt
 ```
+Symmetic test:
+g++ test-blockcipher.cpp -Iinclude ../symmetric/spn-multi.cpp -o test-blockcipher 

@@ -46,14 +46,14 @@ void encodeTo16Ctxt(Vec<ZZX>& encData, const Vec<uint8_t>& data,
 		const EncryptedArrayDerived<PA_GF2>& ea);
 
 
-// Decode native HE plaintext as AES plaintext/ciphertext bytes
+// Decode native HE plaintext as Yux plaintext/ciphertext bytes
 void decodeTo16Ctxt(Vec<uint8_t>& data, const Vec<ZZX>& encData,
 		const EncryptedArrayDerived<PA_GF2>& ea);
 
 void buildRoundConstant(Ctxt& encA,
 		const EncryptedArrayDerived<PA_GF2>& ea);
 
-// run the AES key-expansion and then encrypt the expanded key.
+// run the Yux key-expansion and then encrypt the expanded key.
 void encryptSymKey(vector<Ctxt>& eKey, Vec<uint8_t>& symKey, const PubKey& hePK,
     const EncryptedArrayDerived<PA_GF2>& ea, bool key2dec);
 
@@ -75,7 +75,7 @@ void homSymDec(vector<Ctxt>& eData, const vector<Ctxt>& symKey, Ctxt& encA);
 // raw plaintext bytes, and the sym key encrypted under HE. The output
 // is a doubly-encrypted ciphertext, out=Enc_HE(Enc_Sym(X)). The symKey
 // array contains an encryption of the expanded sym key, the number of
-// sym rounds is aesKey.size() -1.
+// sym rounds is YuxKey.size() -1.
 // NOTE: This is a rather useless method, other than for benchmarking
 void homSymDec(vector<Ctxt>& eData, const vector<Ctxt>& symKey,
 		const Vec<uint8_t> inBytes, const EncryptedArrayDerived<PA_GF2>& ea);
@@ -101,7 +101,7 @@ void homSymEnc(vector<Ctxt>& eData, const vector<Ctxt>& symKey,
 void encodeToKeysForExpand(ZZX& encData, const Vec<uint8_t>& data, const int32_t len,
   const EncryptedArrayDerived<PA_GF2>& ea);
 
-// run the AES key-expansion and then encrypt the expanded key.
+// run the Yux key-expansion and then encrypt the expanded key.
 void encryptSymKeyForExpand(Ctxt& eKey, Vec<uint8_t>& symKey, const PubKey& hePK,
   const EncryptedArrayDerived<PA_GF2>& ea, bool key2dec);
 

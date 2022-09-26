@@ -59,11 +59,11 @@ int main(int argc, char **argv){
   setTimersOn();
   double tm = -GetTime();
 
-  static const uint8_t aesPolyBytes[] = { 0x1B, 0x1 }; // X^8+X^4+X^3+X+1
+  static const uint8_t YuxPolyBytes[] = { 0x1B, 0x1 }; // X^8+X^4+X^3+X+1
   
-  const GF2X aesPoly = GF2XFromBytes(aesPolyBytes, 2);  
+  const GF2X YuxPoly = GF2XFromBytes(YuxPolyBytes, 2);  
   cout << "-----X^8+X^4+X^3+X+1-------\n";  
-  cout << "-----aesPoly: " << aesPoly << "\n";
+  cout << "-----YuxPoly: " << YuxPoly << "\n";
 
   cout << "computing key-independent tables..." << std::flush;
   // Some code here to choose all the parameters, perhaps
@@ -121,7 +121,7 @@ int main(int argc, char **argv){
   tm += GetTime();
   cout << "done in "<<tm<<" seconds\n";
 
-  EncryptedArrayDerived<PA_GF2> ea(context, aesPoly, context.getAlMod());
+  EncryptedArrayDerived<PA_GF2> ea(context, YuxPoly, context.getAlMod());
   cout << "constuct an Encrypted array object ea.\n";
 
   long nslots = ea.size(); // number of plaintext slots

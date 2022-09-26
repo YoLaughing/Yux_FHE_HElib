@@ -9,6 +9,8 @@
 #include "../symmetric/spn-multi.h"
 #include "params.h"
 
+#define PolyType DoubleCRT
+
 using namespace helib;
 using namespace std;
 using namespace NTL;
@@ -31,16 +33,16 @@ static long mValues[][15] = {
 };
 
 
-class Transcipher4
+class Transcipher1
 {
 public:
 
 // Encode plaintext/ciphertext bytes as native HE plaintext
-void encodeTo4Ctxt(Vec<ZZX>& encData, const Vec<uint8_t>& data,
+void encodeTo1Ctxt(Vec<ZZX>& encData, const Vec<uint8_t>& data,
 		const EncryptedArrayDerived<PA_GF2>& ea);
 
 // Decode native HE plaintext as Yux plaintext/ciphertext bytes
-void decodeTo4Ctxt(Vec<uint8_t>& data, const Vec<ZZX>& encData,
+void decodeTo1Ctxt(Vec<uint8_t>& data, const Vec<ZZX>& encData,
 		const EncryptedArrayDerived<PA_GF2>& ea);
 
 void buildRoundConstant(Ctxt& encA,
@@ -50,8 +52,17 @@ void buildRoundConstant(Ctxt& encA,
 void encryptSymKey(vector<Ctxt>& eKey, Vec<uint8_t>& symKey, const PubKey& hePK,
     const EncryptedArrayDerived<PA_GF2>& ea, bool key2dec);
 
-void decSboxFunc(vector<Ctxt>& eData, long begin, Ctxt& encA, const EncryptedArrayDerived<PA_GF2>& ea);
+void buildLinEnc(vector<PolyType>& encLinTran,
+			const EncryptedArrayDerived<PA_GF2>& ea);
 
+void buildLinEnc2(vector<PolyType>& encLinTran,
+			const EncryptedArrayDerived<PA_GF2>& ea);
+
+void decSboxFunc(Ctxt& c, vector<PolyType> encLinTran, Ctxt& encA, const EncryptedArrayDerived<PA_GF2>& ea);
+
+void decSboxFunc2(Ctxt& c, vector<PolyType> encLinTran, Ctxt& encA, const EncryptedArrayDerived<PA_GF2>& ea);
+
+void Linear_function(Ctxt& c, const EncryptedArrayDerived<PA_GF2>& ea);
 void decLinearFunc(vector<Ctxt>& eData, long begin, const EncryptedArrayDerived<PA_GF2>& ea);
 
 void homSymDec(vector<Ctxt>& eData, const vector<Ctxt>& symKey, const EncryptedArrayDerived<PA_GF2>& ea);
@@ -64,14 +75,4 @@ void homSymDec(vector<Ctxt>& eData, const vector<Ctxt>& symKey, const EncryptedA
 // NOTE: This is a rather useless method, other than for benchmarking
 void homSymDec(vector<Ctxt>& eData, const vector<Ctxt>& symKey,
 		       const Vec<uint8_t> inBytes, const EncryptedArrayDerived<PA_GF2>& ea);
-
-void encSboxFunc(vector<Ctxt>& eData, long begin, Ctxt& encA, const EncryptedArrayDerived<PA_GF2>& ea);
-
-void encLinearFunc(vector<Ctxt>& eData, long begin, const EncryptedArrayDerived<PA_GF2>& ea);
-
-void homSymEnc(vector<Ctxt>& eData, const vector<Ctxt>& symKey, const EncryptedArrayDerived<PA_GF2>& ea);
-
-void homSymEnc(vector<Ctxt>& eData, const vector<Ctxt>& symKey,
-		       const Vec<uint8_t> inBytes, const EncryptedArrayDerived<PA_GF2>& ea);
-
 };
