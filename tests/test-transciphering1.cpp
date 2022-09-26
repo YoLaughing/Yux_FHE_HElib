@@ -31,26 +31,6 @@ namespace NTL {} using namespace NTL;
 //#define homEnc
 
 
-static const uint8_t roundConstant = 0xCD; // x^7+x^6+x^3+x^2+1
-
-// lm: I have set the parameters of idx = 0, 4
-static long mValues[][15] = { 
-//{ p, phi(m),  m,   d, m1,  m2, m3,   g1,    g2,   g3,ord1,ord2,ord3, c_m}
-  { 2,  512,    771, 16,771,  0,  0,     5,    0,    0,-32,  0,  0, 100, 980}, // m=(3)*{257} :-( m/phim(m)=1.5 C=77 D=2 E=4
-  { 2, 4096,   4369, 16, 17, 257, 0,   258, 4115,    0, 16,-16,  0, 100, 590}, // m=17*(257) :-( m/phim(m)=1.06 C=61 D=3 E=4
-  { 2, 16384, 21845, 16, 17, 5, 257,  8996,17477,21591, 16,  4,-16,1600, 490}, // m=5*17*(257) :-( m/phim(m)=1.33 C=65 D=4 E=4
-  { 2, 23040, 28679, 24, 17, 7, 241, 15184, 4098,28204, 16,  6,-10,1500, 430}, // m=7*17*(241) m/phim(m)=1.24    C=63  D=4 E=3
-  { 2, 46080, 53261, 24, 17,13, 241, 43863,28680,15913, 16, 12,-10, 100, 1300}, // m=13*17*(241) m/phim(m)=1.15   C=69  D=4 E=3
-  { 2, 64512, 65281, 48, 97,673,  0, 43073,22214,    0, 96,-14,  0, 100, 480}, // m=97*(673) :-( m/phim(m)=1.01  C=169 D=3 E=4
-  {  2,  1728,  4095, 12,   7,   5,117,  2341,  3277, 3641,   6,   4,   6, 100, 200}, // m=(3^2)*5*7*{13} m/phim(m)=2.36 C=26 D=3 E=2 
-  {  2, 34848, 45655, 44, 23,1985,  0, 33746, 27831, 0,  22,  36, 0, 100, 200}, // m=(5)*23*{397} m/phim(m)=1.31  C=100 D=2 E=2
-  { 2, 49500, 49981, 30, 151, 331, 0,  6952, 28540,  0, 150,  11,0, 100, 200}, // m=151*(331) m/phim(m)=1        C=189 D=2 E=1  1650 slots
-  { 2, 42336, 42799, 21, 127, 337,  0, 25276, 40133, 0, 126,  16,0, 200, 200}, // m=127*(337) m/phim(m)=1.01     C=161 D=2 E=0  2016 slots
-  
-};
-
-
-#if 1
 int main(int argc, char **argv){
 
   // ArgMapping amap;
@@ -71,7 +51,7 @@ int main(int argc, char **argv){
   //  long phim = mValues[idx][1];
   long m = mValues[idx][2];
 
-  long bits = mValues[idx][14];
+  long bits = mValues[idx][44];
 
   cout << "-----Test_Sym: c=" << c
       << ", packed=" << packed
@@ -242,11 +222,15 @@ int main(int argc, char **argv){
   myfile << "\nHomEnc symmetric round key done in "<<tm<<" seconds\n";
 
   // Perform homomorphic Symmetry
-  cout << "homomorphic symmtric decryption Begin!\n"<< std::flush;
+ cout << "Homomorphic symmtric decryption Begin!\n"<< endl;
+
   vector< Ctxt > homEncrypted;
   tm = -GetTime();
+  auto start = std::chrono::high_resolution_clock::now();
   trans.homSymDec(homEncrypted, encryptedSymKey, symCtxt, ea);
   tm += GetTime();
+  auto stop = std::chrono::high_resolution_clock::now();
+
   cout << "Homomorphic symmtric decryption done in "<<tm<<" seconds\n";
   // homomorphic decryption
   Vec<ZZX> poly(INIT_SIZE, homEncrypted.size());
@@ -269,7 +253,9 @@ int main(int argc, char **argv){
     }
   }
   else {
-    cout << "Homomorphic symmtric decryption Finish! Done in "<<tm<<" seconds\n";
+    auto glasped = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    cout << "Homomorphic symmtric decryption correct!! Done [glasped.count()] in "<<glasped.count()<<" ms"<<endl;
+    cout << "Homomorphic symmtric decryption correct!! Done in "<<tm<<" seconds\n"; 
     //  Write file
     // myfile << "[homEncrypted] :  " << homEncrypted << "\n\n";
     { 
@@ -285,7 +271,7 @@ int main(int argc, char **argv){
         myfile << "["; for (long i=0; i<ptxt.length() && i<32; i++)   myfile << std::hex << std::setw(2) << (long) ptxt[i] << " ";
         if (ptxt.length()>32) myfile << "...";  myfile << "]\n";
     }
-      cout << "-------After homomorphic decrypt and Decode4MUT's length:   " << tmpBytes.length() <<"\n";
+      cout << "-------After homomorphic decrypt and Decode's length:   " << tmpBytes.length() <<"\n";
       cout << "  input symCtxt = "; printState(symCtxt); cout << endl;
       cout << "output tmpBytes = "; printState(tmpBytes); cout << endl;
       cout << " should be ptxt = "; printState(ptxt); cout << endl;
@@ -296,5 +282,4 @@ int main(int argc, char **argv){
   #endif
 
 }
-#endif
 

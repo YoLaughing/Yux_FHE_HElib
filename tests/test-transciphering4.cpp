@@ -43,7 +43,7 @@ int main(int argc, char **argv){
   long m = mValues[idx][2];
   // long m = 45067;
 
-  long bits = mValues[idx][14];
+  long bits = mValues[idx][4];
 
   cout << "-----Test_Sym: c=" << c
       << ", packed=" << packed
