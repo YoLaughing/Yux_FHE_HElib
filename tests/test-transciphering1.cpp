@@ -35,7 +35,7 @@ int main(int argc, char **argv){
 
   // ArgMapping amap;
 
-  long idx = 0;
+  long idx = 4; //0
   // amap.arg("sz", idx, "parameter-sets: toy=0 through huge=5");
 
   long c=3;
@@ -51,7 +51,7 @@ int main(int argc, char **argv){
   //  long phim = mValues[idx][1];
   long m = mValues[idx][2];
 
-  long bits = mValues[idx][44];
+  long bits = mValues[idx][4];
 
   cout << "-----Test_Sym: c=" << c
       << ", packed=" << packed
