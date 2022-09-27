@@ -1,5 +1,6 @@
 #include <cstring>
 #include <stdint.h>
+#include <iostream>
 #include <chrono>
 #include <NTL/ZZX.h>
 #include <NTL/GF2X.h>
@@ -25,8 +26,8 @@ using namespace NTL;
 //TODO: too long time, so please run it in server (remove it)
 
 void verify(Vec<uint8_t> symCtxt, Vec<uint8_t> tmpBytes, Vec<uint8_t> ptxt,
-            double tm, std::chrono::time_point<std::chrono::steady_clock> stop,
-            std::chrono::time_point<std::chrono::steady_clock> start)
+            double tm, std::chrono::time_point<std::chrono::high_resolution_clock> stop,
+            std::chrono::time_point<std::chrono::high_resolution_clock> start)
 {
   // Check that homSymDec(symCtxt) = ptxt succeeeded
   // symCtxt = symEnc(ptxt)
@@ -63,7 +64,7 @@ void test()
 
   long p = mValues[idx][0];
   long m = mValues[idx][2];
-  long bits = mValues[idx][4] + 30;
+  long bits = mValues[idx][4] + 20;
 
   cout << "-----Test_Sym: p=" << p
       << ", m=" << m
@@ -185,18 +186,23 @@ void test()
   cout << "handle round key" << endl;
   vector<Ctxt> expandSymKey;
   long length_s = BlockByte * (ROUND+1);
+  tm = -GetTime();
+  auto start = std::chrono::high_resolution_clock::now();
   trans.handleRoundKey(expandSymKey, encryptedSymKey, publicKey, ea, length_s);
-  tm += GetTime();  
+  tm += GetTime();
+  auto stop = std::chrono::high_resolution_clock::now();
   cout << "done in "<<tm<<" seconds\n";
+  auto glasped = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+  cout << "done [glasped.count()] in "<<glasped.count()<<" ms"<<endl;
 
   // Perform homomorphic Symmetry
   cout << "Homomorphic symmtric decryption Begin!\n"<< endl;
   vector<Ctxt> homEncrypted;
   tm = -GetTime();
-  auto start = std::chrono::high_resolution_clock::now();
+  start = std::chrono::high_resolution_clock::now();
   trans.homSymDec(homEncrypted, expandSymKey, symCtxt, ea);
   tm += GetTime();
-  auto stop = std::chrono::high_resolution_clock::now();
+  stop = std::chrono::high_resolution_clock::now();
 
   // homomorphic decryption
   Vec<ZZX> poly(INIT_SIZE, homEncrypted.size());

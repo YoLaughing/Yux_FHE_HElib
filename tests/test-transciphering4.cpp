@@ -24,7 +24,7 @@ int main(int argc, char **argv){
 
   //----FHE system setup begin----
   // ArgMapping amap;
-  long idx = 3;
+  long idx = 4;
   // amap.arg("sz", idx, "parameter-sets: toy=0 through huge=5");
   long c=3;
   // amap.arg("c", c, "number of columns in the key-switching matrices");

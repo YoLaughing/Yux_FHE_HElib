@@ -216,9 +216,9 @@ void Transcipher16::handleRoundKey(vector<Ctxt>& ekey, const Ctxt& input, const 
     Ctxt tmpCtxt(hePK);
     ekey.resize(len, tmpCtxt);
   } // allocate space
-  cout << "handleSingleRoundKey(i/" << len << "): (" << endl;
+  cout << "handleSingleRoundKey(i-th/" << len << "): (" << endl;
 #ifdef expandMultiThreads
-  size_t threadsNum = 8; //32, power of two
+  size_t threadsNum = 16; //8, 16, 30
   thread threads[threadsNum];
   size_t threadPerCount = len/threadsNum;
 
