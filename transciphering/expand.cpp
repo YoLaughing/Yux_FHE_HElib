@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <iostream>
 #include <fstream>
 #include <thread>
@@ -201,7 +202,8 @@ void Transcipher16::handleRoundKeyForThreads(vector<Ctxt>& ekey, const Ctxt& inp
     tempCtxt.multByConstant(encodeData);
     //tempCtxt.cleanUp();
 
-    cout << i << "/" << len << endl;
+    //cout << i << " ";
+    printf("%3ld ", i); fflush(0);
     handleSingleRoundKey(ekey[i], tempCtxt, hePK, ea);
     slots.clear();
   }
