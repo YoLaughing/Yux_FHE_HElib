@@ -18,10 +18,10 @@ using namespace helib;
 using namespace std;
 using namespace NTL;
 
-#define homDec
+// #define homDec
 //#define DEBUG
 #define multiThreads // 4 threads
-// #define homEnc
+#define homEnc
 
 int main(int argc, char **argv){
   cout << "-----------Begin-------\n";
@@ -250,18 +250,18 @@ int main(int argc, char **argv){
   // 3. Encrypt and check that you have the same thing as before
   #ifdef homEnc
   vector< Ctxt > doublyEncrypted;
-  encryptSymKey(encryptedSymKey, symKey, publicKey, ea, /*key2dec=*/false);
+  trans.encryptSymKey(encryptedSymKey, symKey, publicKey, ea, /*key2dec=*/false);
   
   cout << "Homomorphic symmtric encryption Begin"<< endl; 
   tm = -GetTime();
-  homSymEnc(doublyEncrypted, encryptedSymKey, ptxt, ea);
+  trans.homSymEnc(doublyEncrypted, encryptedSymKey, ptxt, ea);
   tm += GetTime();
   cout << "Homomorphic symmtric encryption ";
 
   Vec<ZZX> polyEnc(INIT_SIZE, doublyEncrypted.size());
   for (long i=0; i<polyEnc.length(); i++)
     secretKey.Decrypt(polyEnc[i], doublyEncrypted[i]);
-  decodeTo16Ctxt(tmpBytes, polyEnc, ea);
+  trans.decodeTo16Ctxt(tmpBytes, polyEnc, ea);
 
   if (symCtxt != tmpBytes) {
     cout << "@ Encryption error\n";
