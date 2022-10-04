@@ -89,7 +89,7 @@ int main(int argc, char **argv){
 
   long e = mValues[idx][3] /8; // extension degree
   cout << "-----"<<context.getZMStar().getNSlots()<<" slots ("
-       << (context.getZMStar().getNSlots()/8)<<" blocks) per ctxt, red(p) = "
+       << (context.getZMStar().getNSlots()/4)<<" blocks total), red(p) = "
        << (context.getZMStar().getOrdP());
   if (packed)
     cout << ".  x"<<e<<" ctxts";

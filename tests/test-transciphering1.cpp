@@ -102,7 +102,7 @@ int main(int argc, char **argv){
         <<context.logOfProduct(allPrimes)
         <<", \n3. security level = "<<context.securityLevel() 
         << ", \n4. nslots = "<<context.getZMStar().getNSlots()<<" ("
-        << (context.getZMStar().getNSlots())/4<<" blocks) per ctxt\n";
+        << (context.getZMStar().getNSlots())/16<<" blocks) per ctxt\n";
   myfile.close();
   }
   long e = mValues[idx][3] /8; // extension degree

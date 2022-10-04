@@ -50,13 +50,13 @@ int main(int argc, char **argv){
   #endif
 
   cout << "-----Test_Sym: c=" << c
-      << ", m=" << m
+      << ", m=" << m << ", bits =" << bits 
       << endl;
 
   ofstream myfile;
   stringstream filename;
   filename << "result//SPN_16Ctxt_128bit_m = " << m << ", p = " << p <<  
-  ", c = " << c <<
+  ", c = " << c << 
   ", nRounds = " << ROUND << ".txt"; 
   
   setTimersOn();
@@ -76,7 +76,7 @@ int main(int argc, char **argv){
                   .m(m)
                   .p(p)
                   .r(1)
-                  .c(m)
+                  .c(c)
                   .bits(bits)
                   .build());
 
@@ -93,7 +93,7 @@ int main(int argc, char **argv){
 	<<", security level: "<<context.securityLevel() << endl;
 
   myfile << "[ m = " << m << ", p = " << p
-        << ", c = " << c << ", nRounds = " << ROUND << "]\n"
+        << ", c = " << c <<", bits = " << bits << ", nRounds = " << ROUND << "]\n"
         <<"1. "<<context.numPrimes()<<" primes , \n2. total bitsize = "
         <<context.logOfProduct(allPrimes)
         <<", \n3. security level = "<<context.securityLevel() 
@@ -103,7 +103,7 @@ int main(int argc, char **argv){
   myfile.close();
   long e = mValues[idx][3] /8; // extension degree
   cout << "-----"<<context.getZMStar().getNSlots()<<" slots ("
-       << (context.getZMStar().getNSlots()/8)<<" blocks) per ctxt, ord(p) = "
+       << (context.getZMStar().getNSlots())<<" blocks total), ord(p) = "
        << (context.getZMStar().getOrdP()) << "\n";
   if (packed)
     cout << ". x"<<e<<" ctxts";
