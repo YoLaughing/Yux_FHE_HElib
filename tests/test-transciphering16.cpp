@@ -18,10 +18,10 @@ using namespace helib;
 using namespace std;
 using namespace NTL;
 
-// #define homDec
+#define homDec
 //#define DEBUG
 #define multiThreads // 4 threads
-#define homEnc
+// #define homEnc
 
 int main(int argc, char **argv){
   cout << "-----------Begin-------\n";
@@ -45,6 +45,9 @@ int main(int argc, char **argv){
   long m = mValues[idx][2];
 
   long bits = mValues[idx][4];
+  #ifdef homEnc
+  bits +=15;
+  #endif
 
   cout << "-----Test_Sym: c=" << c
       << ", m=" << m
@@ -73,7 +76,7 @@ int main(int argc, char **argv){
                   .m(m)
                   .p(p)
                   .r(1)
-                  .c(m==28679?9:3)
+                  .c(m)
                   .bits(bits)
                   .build());
 
@@ -117,7 +120,11 @@ int main(int argc, char **argv){
 
   secretKey.GenSecKey(); 
   // actually generate a secret key with Hamming weight w
-
+  
+  #ifdef homEnc
+  addFrbMatrices(secretKey);
+  #endif
+  
   tm += GetTime();
   cout << "done in "<<tm<<" seconds\n";
 
@@ -256,7 +263,7 @@ int main(int argc, char **argv){
   tm = -GetTime();
   trans.homSymEnc(doublyEncrypted, encryptedSymKey, ptxt, ea);
   tm += GetTime();
-  cout << "Homomorphic symmtric encryption ";
+  cout << "Homomorphic symmtric encryption End in "<<tm<<" seconds\n";;
 
   Vec<ZZX> polyEnc(INIT_SIZE, doublyEncrypted.size());
   for (long i=0; i<polyEnc.length(); i++)

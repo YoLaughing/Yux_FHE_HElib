@@ -34,8 +34,8 @@ mkdir build
 cd build
 cmake ..
 make
-./TEST_SPN
-./TEST_SPN_16Ctxt
+./test/test-transciphering16
+
 ```
 Symmetic test:
 g++ test-blockcipher.cpp -Iinclude ../symmetric/spn-multi.cpp -o test-blockcipher 
