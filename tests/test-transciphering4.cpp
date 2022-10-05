@@ -16,7 +16,7 @@ using namespace std;
 using namespace NTL;
 
 #define homDec
-#define DEBUG
+// #define DEBUG
 // #define homEnc
 
 

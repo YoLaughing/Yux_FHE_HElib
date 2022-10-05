@@ -4,8 +4,6 @@
 #include <chrono>
 #include <NTL/ZZX.h>
 #include <NTL/GF2X.h>
-// #include "../src/EncryptedArray.h"
-// #include "../src/hypercube.h"
 
 #include <helib/helib.h>
 #include <helib/ArgMap.h>

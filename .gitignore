@@ -1,2 +1,12 @@
 
 build/*
+
+# vscode
+.vscode/*
+
+# MacOS
+.DS_Store
+*/.DS_Store
+
+# helib
+helib.log

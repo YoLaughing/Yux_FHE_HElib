@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include <iostream>
 #include <fstream>
 #include <thread>
@@ -13,7 +14,10 @@ void Transcipher16::encodeToKeysForExpand(ZZX& encData, const Vec<uint8_t>& data
 		const EncryptedArrayDerived<PA_GF2>& ea)
 {
   vector<GF2X> slots(ea.size(), GF2X::zero());
-  long repeats = ea.size()/len;
+  long repeats = 1;
+  if (ea.size() == 1920 || ea.size() == 960) { // faster expand for 1920 and 960
+    repeats = ea.size()/len;
+  }
 
   for (long j=0; j<len; j++) // j is the block number in this ctxt
     for (long l=0; l<repeats; l++) {
@@ -52,12 +56,7 @@ void Transcipher16::encryptSymKeyForExpand(Ctxt& eKey, Vec<uint8_t>& symKey, con
     memcpy(&expanded[0], &roundKeySchedule[0], length_s);
     ZZX encoded;
     encodeToKeysForExpand(encoded, expanded, length_s, ea);      // encode as HE plaintext
-    /*
-    std::cout << "expanded = ";
-    for (int j = 0; j < length_s; j++)
-      std::cout << (int16_t)expanded[j] << ",";
-    std::cout << std::endl;
-    */
+
     // encrypt the encoded key
     hePK.Encrypt(eKey, encoded);
 
@@ -160,9 +159,7 @@ void Transcipher16::handleSingleRoundKey(Ctxt& ekey, const Ctxt& input, const Pu
   for (size_t i = 1; i <= logOfSlots; i++)
   {
     temp[i] = temp[i-1];
-    //ea.rotate1D(temp[i], 1, 0x0001<<i);
     long shiftNums = std::pow(2, i-1);
-    //ea.rotate1D(temp[i], 0, shiftNums);
     ea.rotate(temp[i], shiftNums);
     temp[i] += temp[i-1];
   }
@@ -216,23 +213,26 @@ void Transcipher16::handleRoundKey(vector<Ctxt>& ekey, const Ctxt& input, const 
 
   {   
     Ctxt tmpCtxt(hePK);
-    ekey.resize(len, tmpCtxt);
+    ekey.resize(len, tmpCtxt); // len = 240
   } // allocate space
   cout << "handleSingleRoundKey(i-th/" << len << "): (" << endl;
 #ifdef expandMultiThreads
   size_t threadsNum = 16; //8, 16, 30
   thread threads[threadsNum];
-  size_t threadPerCount = len/threadsNum;
+  size_t threadPerCount = ceil((double)len/threadsNum);
 
-  for (int i=0; i<threadsNum; i++)
+  threadsNum = ceil((double)len / threadPerCount); // update thread numbers
+  for (int i=0; i<threadsNum; i++) {
+    size_t first = threadPerCount*i;
+    size_t last = (i != threadsNum-1)? (threadPerCount*(i+1)): len;
     threads[i] = std::thread(handleRoundKeyForThreads, ref(ekey), ref(input),
-      ref(hePK), ref(ea), len, data, threadPerCount*i, threadPerCount*(i+1));
+      ref(hePK), ref(ea), len, data, first, last);
+  }
   for (int i=0; i<threadsNum; i++)
     threads[i].join();
 
 #else // else expandMultiThreads
-  //for (size_t i = 0; i < len; i++)
-  for (size_t i = 0; i < 5; i++)
+  for (size_t i = 0; i < len; i++)
   {
     auto expandStart = std::chrono::high_resolution_clock::now();
     ZZX encodeData;

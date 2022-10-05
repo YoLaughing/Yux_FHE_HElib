@@ -2,8 +2,6 @@
 #include <stdint.h>
 #include <NTL/ZZX.h>
 #include <NTL/GF2X.h>
-// #include "../src/EncryptedArray.h"
-// #include "../src/hypercube.h"
 
 #include <helib/helib.h>
 #include <helib/ArgMap.h>
@@ -12,24 +10,13 @@
 #include "../transciphering/transciphering1.h"
 #include "../transciphering/utils.h"
 
-#ifdef USE_ZZX_POLY
-#define PolyType ZZX
-#else
-#if (ALT_CRT)
-#define PolyType AltCRT
-#else
-#define PolyType DoubleCRT
-#endif
-#endif
 
 using namespace helib;
-namespace std {} using namespace std;
-namespace NTL {} using namespace NTL;
+using namespace std;
+using namespace NTL;
 
 #define homDec
-#define DEBUG
-//#define homEnc
-
+// #define DEBUG
 
 int main(int argc, char **argv){
 
