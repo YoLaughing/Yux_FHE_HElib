@@ -18,7 +18,6 @@ using namespace NTL;
 
 #define homDec
 //#define DEBUG
-#define multiThreads // 4 threads
 // #define homEnc
 
 int main(int argc, char **argv){

@@ -19,9 +19,8 @@ using namespace NTL;
 
 #define homDec
 //#define DEBUG
-#define multiThreads // 4 threads
 
-//TODO: too long time, so please run it in server (remove it)
+//TODO: too long time, so you can run it in a server
 
 void verify(Vec<uint8_t> symCtxt, Vec<uint8_t> tmpBytes, Vec<uint8_t> ptxt,
             double tm, std::chrono::time_point<std::chrono::high_resolution_clock> stop,

@@ -7,7 +7,9 @@
 #include "transciphering16.h"
 #include "params.h"
 
-// Encode  plaintext/ciphertext bytes as native HE plaintext
+#define expandMultiThreads
+
+// Encode plaintext/ciphertext bytes as native HE plaintext
 // packing
 // only for ea.size() > 240, encode to a single ciphertext
 void Transcipher16::encodeToKeysForExpand(ZZX& encData, const Vec<uint8_t>& data, const int32_t len,
@@ -15,7 +17,8 @@ void Transcipher16::encodeToKeysForExpand(ZZX& encData, const Vec<uint8_t>& data
 {
   vector<GF2X> slots(ea.size(), GF2X::zero());
   long repeats = 1;
-  if (ea.size() == 1920 || ea.size() == 960) { // faster expand for 1920 and 960
+  // faster expand for 1920 and 960. Other sizes can also be customized.
+  if (ea.size() == 1920 || ea.size() == 960) { 
     repeats = ea.size()/len;
   }
 
@@ -189,7 +192,11 @@ void Transcipher16::handleRoundKeyForThreads(vector<Ctxt>& ekey, const Ctxt& inp
     ZZX encodeData;
     vector<GF2X> slots(ea.size(), GF2X::zero());
 
-    long repeats = ea.size() /len;
+    long repeats = 1;
+    // faster expand for 1920 and 960. Other sizes can also be customized.
+    if (ea.size() == 1920 || ea.size() == 960) { 
+      repeats = ea.size()/len;
+    }
     for (long j=0; j<repeats; j++)
     GF2XFromBytes(slots[i*repeats + j], &data, 1);
     
@@ -199,7 +206,6 @@ void Transcipher16::handleRoundKeyForThreads(vector<Ctxt>& ekey, const Ctxt& inp
     tempCtxt.multByConstant(encodeData);
     //tempCtxt.cleanUp();
 
-    //cout << i << " ";
     printf("%3ld ", i); fflush(0);
     handleSingleRoundKey(ekey[i], tempCtxt, hePK, ea);
     slots.clear();
@@ -234,29 +240,24 @@ void Transcipher16::handleRoundKey(vector<Ctxt>& ekey, const Ctxt& input, const 
 #else // else expandMultiThreads
   for (size_t i = 0; i < len; i++)
   {
-    auto expandStart = std::chrono::high_resolution_clock::now();
     ZZX encodeData;
     vector<GF2X> slots(ea.size(), GF2X::zero());
 
-    long repeats = ea.size() /len;
+    long repeats = 1;
+    // faster expand for 1920 and 960. Other sizes can also be customized.
+    if (ea.size() == 1920 || ea.size() == 960) { 
+      repeats = ea.size()/len;
+    }
     for (long j=0; j<repeats; j++)
     GF2XFromBytes(slots[i*repeats + j], &data, 1);
     ea.encode(encodeData, slots);
 
     Ctxt tempCtxt = input;
     tempCtxt.multByConstant(encodeData);
-    cout << i << "/" << len << endl;
 
+    printf("%3ld ", i); fflush(0);
     handleSingleRoundKey(ekey[i], tempCtxt, hePK, ea);
-
-    auto expandStop = std::chrono::high_resolution_clock::now();
-    auto expandGlapsed = std::chrono::duration_cast<std::chrono::milliseconds>(expandStop - expandStart);
-    cout << "expand " << i << " costs " << expandGlapsed.count() << " ms" << std::endl;
-
-    //ekey[i] =  tempCtxt;
   }
-  //for (size_t i = 5; i < len; i++)
-  //  ekey[i] = ekey[0];
 
 #endif // end expandMultiThreads
 

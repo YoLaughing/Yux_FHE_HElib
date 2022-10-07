@@ -7,7 +7,7 @@
 #include <helib/helib.h>
 #include <helib/ArgMap.h>
 #include <helib/DoubleCRT.h>
-//#include "symmetric/spn-multi.h"
+
 #include "../symmetric/spn-multi.h"
 #include "params.h"
 
@@ -16,7 +16,6 @@ using namespace std;
 using namespace NTL;
 
 #define multiThreads // 4 threads
-#define expandMultiThreads
 
 static long nBlocks = 20;
 
